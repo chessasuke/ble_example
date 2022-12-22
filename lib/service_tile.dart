@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:math';
 
@@ -66,13 +67,17 @@ class CharacteristicTile extends StatelessWidget {
       initialData: characteristic.lastValue,
       builder: (c, snapshot) {
         final value = snapshot.data;
+        print(' ------ value: $value');
+        print(' ------ lastValue: ${characteristic.lastValue}');
+        print(' ------ value: ${characteristic.onValueChangedStream.last}');
+
         return ExpansionTile(
           title: ListTile(
             leading: Column(
               children: [
                 Text(
                     'Characteristic - ${characteristic.uuid.toString().guidNum}'),
-                Text('lastValue: ${value.toString()}')
+                Text('lastValue: ${characteristic.value.toString()}')
               ],
             ),
             contentPadding: const EdgeInsets.all(0.0),
@@ -101,7 +106,8 @@ class CharacteristicTile extends StatelessWidget {
               CharacteristicProperty(
                 isNotifying: characteristic.isNotifying,
                 property: Property.notify,
-                operation: () async => await getOperation(context, Property.notify),
+                operation: () async =>
+                    await getOperation(context, Property.notify),
               ),
           ],
         );
@@ -123,9 +129,14 @@ class CharacteristicTile extends StatelessWidget {
         break;
       case Property.write:
         try {
-          characteristic.write([9]);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Sent 9!')));
+          final valueToWrite = await getTextToSend(context);
+          if (valueToWrite != null) {
+            final bytes = utf8.encode(valueToWrite);
+            print(' ------ bytes: ${bytes.toString()}');
+            await characteristic.write(bytes);
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(valueToWrite)));
+          }
         } catch (e) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(e.toString())));
@@ -134,9 +145,14 @@ class CharacteristicTile extends StatelessWidget {
 
       case Property.writeWithOutResponse:
         try {
-          characteristic.write([9]);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('Sent 9!')));
+          final valueToWrite = await getTextToSend(context);
+          if (valueToWrite != null) {
+            final bytes = utf8.encode(valueToWrite);
+            print(' ------ bytes: ${bytes.toString()}');
+            await characteristic.write(bytes, withoutResponse: true);
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(valueToWrite)));
+          }
         } catch (e) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(e.toString())));
@@ -154,6 +170,37 @@ class CharacteristicTile extends StatelessWidget {
               .showSnackBar(SnackBar(content: Text(e.toString())));
         }
     }
+  }
+
+  Future<String?> getTextToSend(BuildContext context) async {
+    final _controller = TextEditingController();
+    final String? valueToWrite = await showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: const Text('Write Value'),
+            children: [
+              TextField(
+                controller: _controller,
+                onChanged: (val) => print(' ------ value: $val'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, null),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, _controller.text),
+                    child: const Text('Ok'),
+                  ),
+                ],
+              )
+            ],
+          );
+        });
+    return valueToWrite;
   }
 }
 

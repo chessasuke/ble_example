@@ -23,7 +23,7 @@ class BleApp extends StatelessWidget {
               return const FindDevicesScreen();
             }
             return BluetoothOffScreen(state: state);
-          }),
+          },),
     );
   }
 }
