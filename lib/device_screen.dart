@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:ble_example/service_tile.dart';
-import 'package:ble_example/scan_result_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
@@ -19,25 +17,25 @@ class DeviceScreen extends StatelessWidget {
                 .map(
                   (c) => CharacteristicTile(
                     characteristic: c,
-                    onReadPressed: (chracteristic, context) => onReadPressed(
-                        chracteristic: chracteristic, context: context),
-                    onWritePressed: (BuildContext context) async {
-                      print(' --- Writing [9]');
-                      // await c.write([9]);
-                    },
-                    onNotificationPressed: () async {
-                      await c.setNotifyValue(!c.isNotifying);
-                      await c.read();
-                    },
-                    descriptorTiles: c.descriptors
-                        .map(
-                          (d) => DescriptorTile(
-                            descriptor: d,
-                            onReadPressed: () => d.read(),
-                            onWritePressed: () async => await d.write([9]),
-                          ),
-                        )
-                        .toList(),
+                    // onReadPressed: (chracteristic, context) => onReadPressed(
+                    //     chracteristic: chracteristic, context: context),
+                    // onWritePressed: (BuildContext context) async {
+                    //   print(' --- Writing [9]');
+                    //   // await c.write([9]);
+                    // },
+                    // onNotificationPressed: () async {
+                    //   await c.setNotifyValue();
+                    //   await c.read();
+                    // },
+                    // descriptorTiles: c.descriptors
+                    //     .map(
+                    //       (d) => DescriptorTile(
+                    //         descriptor: d,
+                    //         onReadPressed: () => d.read(),
+                    //         onWritePressed: () async => await d.write([9]),
+                    //       ),
+                    //     )
+                    //     .toList(),
                   ),
                 )
                 .toList(),
@@ -177,16 +175,17 @@ class DeviceScreen extends StatelessWidget {
     // Device disconnected, stopping RSSI stream
   }
 
-  Future<void> onReadPressed(
-      {required BuildContext context,
-      required BluetoothCharacteristic chracteristic}) async {
-    try {
-      final readBytes = await chracteristic.read();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(readBytes.toString())));
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(' ERROR: ${e.toString()}')));
-    }
-  }
+  // Future<void> onReadPressed({
+  //   required BuildContext context,
+  //   required BluetoothCharacteristic chracteristic,
+  // }) async {
+  //   try {
+  //     final readBytes = await chracteristic.read();
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text(readBytes.toString())));
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context)
+  //         .showSnackBar(SnackBar(content: Text(' ERROR: ${e.toString()}')));
+  //   }
+  // }
 }

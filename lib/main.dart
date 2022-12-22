@@ -1,7 +1,3 @@
-// Copyright 2017, Paul DeMarco.
-// All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 import 'package:ble_example/ble_off_screen.dart';
 import 'package:ble_example/find_devices_screen.dart';
 import 'package:flutter/material.dart';
